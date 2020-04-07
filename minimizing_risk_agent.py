@@ -27,7 +27,7 @@ class minimizingRiskAgent(object):
         self.final_hidden_num = []   
         self.final_num_mines = []      
         self.score = 0
-        self.imp = imp #0 for improved agent, 1 for letting agent to know total mine num
+        self.imp = imp #0 for improved agent, 2 for minimizing risk agent, 3 for minimizing cost agent
 
     #--------------------------------------------------------
     # check if the exploring square is valid tile
@@ -437,6 +437,30 @@ class minimizingRiskAgent(object):
         while tempQ.qsize():
             self.cell_unresolved.put(tempQ.get())
 
+        if self.imp == 3:
+            if len(possible_mines) != 0:
+            #if len(possible_mines) != 0:
+                (mine_p, (x, y)) = possible_mines[0]
+
+                if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
+                    #print("process the query nearby")
+                    (aim_x, aim_y) = self.probability_inference(x, y)
+                    if (aim_x, aim_y) == (-1, -1):
+                        #self.random_outside()
+                        i = 1
+                        while(i < len(possible_mines)):
+                            (mine_p, (x,y)) = possible_mines[i]
+                            (aim_x, aim_y) = self.probability_inference(x, y)
+                            if (aim_x, aim_y) != (-1, -1):
+                                self.identify_tile(aim_x, aim_y)
+                                return True
+                            i += 1  
+                        self.random_outside()  
+                        return True
+                    else:
+                        self.identify_tile(aim_x, aim_y)
+                        return True
+
         if self.imp == 2:
             if len(possible_mines) != 0:
             #if len(possible_mines) != 0:
@@ -518,9 +542,8 @@ class minimizingRiskAgent(object):
                 #print("indication 2 success")
             else:    
                 self.board[aim_x][aim_y] = -1 
-                #self.cell_to_inference.put((aim_x, aim_y))
                 self.identified_num += 1
-                #self.score += 1
+                self.score += 1
                 #print("indication 2 fail")
         
         elif indication == 0 and self.env.processQuery(aim_x, aim_y, False) is False:
@@ -605,6 +628,51 @@ def iterateForComparison(num_games, num_mines, dim):
     
     plt.show()
 
+def bonusQuestion(num_games, num_mines, dim):
+    mines = num_mines
+    iterations = 19
+    score = 0
+    score2 = 0
+    avg_score = []
+    avg_score2 = []
+    for t in range(iterations):
+        for i in range(num_games):
+
+            rendered_grid = ImprovedSetting(dim, mines)
+            imp_agent = minimizingRiskAgent(rendered_grid, 2)
+            #score += (imp_agent.gameStart() / mines)
+            score += (imp_agent.gameStart())
+
+            rendered_grid2 = ImprovedSetting(dim, mines)
+            imp_agent2 = minimizingRiskAgent(rendered_grid2, 3)
+            #score2 += (imp_agent2.gameStart() / mines)
+            score2 += (imp_agent2.gameStart())
+        
+        #avg_score.append((score / num_games) * 100)
+        #avg_score2.append((score2 / num_games) * 100)
+        avg_score.append((score / num_games))
+        avg_score2.append((score2 / num_games))
+        
+        mines += 5
+        score = 0
+        score2 = 0
+    
+    fig = plt.figure(figsize=(10,5))
+    ax = fig.add_subplot(111)
+    x = np.arange(10, mines, 5)
+    width = 1.0
+
+    first_plot = ax.bar(x, avg_score, width, color = 'r')
+    second_plot = ax.bar(x + width, avg_score2, width, color = 'g')
+
+    ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
+    ax.set_ylabel("COST (# OF MINES STEPPED IN)")
+    plt.title("Plot Comparison btw Slightly Improved Agents with minimizing cost/minimizing risk")
+    plt.xticks(x)
+    ax.legend( (first_plot[0], second_plot[0]), ('minimizing risk minimizing', ' minimizing cost'))
+    
+    plt.show()
+
 """Please modify four arguments for score, num_mines, num_games, size as you want"""
 if __name__ == "__main__":
     score = 0
@@ -619,3 +687,4 @@ if __name__ == "__main__":
     print("The score rate is " + str((score/num_games) * 100) + "%.")
     
     iterateForComparison(num_games, num_mines, size)
+    bonusQuestion(num_games, num_mines, size)
