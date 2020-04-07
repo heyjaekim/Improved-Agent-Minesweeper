@@ -667,7 +667,7 @@ def bonusQuestion(num_games, num_mines, dim):
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
     ax.set_ylabel("COST (# OF MINES STEPPED IN)")
-    plt.title("Plot Comparison btw Slightly Improved Agents with minimizing cost/minimizing risk")
+    plt.title("Bonus Question for the Comparison btw Slightly Improved Agents When It Comes To Minimize Risk")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0]), ('minimizing risk minimizing', ' minimizing cost'))
     
