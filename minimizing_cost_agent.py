@@ -26,7 +26,7 @@ class minimizingCostAgent(object):
         self.final_hidden_num = []   
         self.final_num_mines = []      
         self.score = 0
-        self.imp = imp #0 for basic agent(improved agent from project 2), 2 for slightly improved agent, 
+        self.imp = imp #0 for original agent, 2 for slightly improved agent, 
                         #and 3 for slightly improved agent by following risk minimizing agent method
 
     #--------------------------------------------------------
@@ -651,7 +651,7 @@ def iterateForComparison(num_games, num_mines, dim):
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
     ax.set_ylabel("COST (# OF MINES STEPPED IN)")
-    plt.title("Plot Comparison btw Original Improved Agent and Slightly Improved Agent")
+    plt.title("Plot Comparison btw Original Agent and Slightly Improved Agent")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0]), ('Original Improved Agent', 'Minimizing Cost Agent'))
     
@@ -681,8 +681,6 @@ def bonusQuestion(num_games, num_mines, dim):
             #score2 += (imp_agent2.gameStart() / mines)
             score2 += (imp_agent2.gameStart())
         
-        #avg_score.append((score / num_games) * 100)
-        #avg_score2.append((score2 / num_games) * 100)
         avg_score.append((score / num_games))
         avg_score2.append((score2 / num_games))
         
