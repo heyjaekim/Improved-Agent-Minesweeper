@@ -732,8 +732,8 @@ def bonusQuestion(num_games, num_mines, dim):
     second_plot = ax.bar(x + width, avg_score2, width, color = 'g')
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
-    ax.set_ylabel("COST (# OF MINES STEPPED IN)")
-    plt.title("Bonus Qeustion for the Comparison btw Slightly Improved Agents When It Comes To Minimize Cost")
+    ax.set_ylabel("COST (# OF MINES STEPPED ON)")
+    plt.title("BQ: Comparison btw Slightly Improved Agents When It Comes To Minimizing Cost")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0]), ('Minimizing Cost Agent', 'Minimizing Risk Agent'))
     
@@ -743,7 +743,7 @@ def bonusQuestion(num_games, num_mines, dim):
 if __name__ == "__main__":
     score = 0
     num_mines = 10
-    num_games = 30
+    num_games = 100
     size = 10
     
     for i in range(num_games):
@@ -752,5 +752,5 @@ if __name__ == "__main__":
         score += (imp_agent.gameStart() / num_mines)
     print("The score rate is " + str((score/num_games) * 100) + "%.")
     
-    iterateForComparison(num_games, num_mines, size)
+    #iterateForComparison(num_games, num_mines, size)
     bonusQuestion(num_games, num_mines, size)

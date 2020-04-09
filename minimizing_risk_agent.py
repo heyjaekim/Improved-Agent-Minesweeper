@@ -614,12 +614,12 @@ def iterateForComparison(num_games, num_mines, dim):
     x = np.arange(10, mines, 5)
     width = 1.0
 
-    first_plot = ax.bar(x, avg_risk, width, color = 'r')
-    second_plot = ax.bar(x + width, avg_risk2, width, color = 'g')
+    first_plot = ax.bar(x, avg_risk, width, color = 'y')
+    second_plot = ax.bar(x + width, avg_risk2, width, color = 'b')
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
     ax.set_ylabel("Average Risk")
-    plt.title("Plot Comparison btw Original Agent and Slightly Improved Agent")
+    plt.title("Plot Comparison btw Original Improved Agent and Minimizing Risk Agent")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0]), ('Original Agent', 'Minimizing Risk Agent'))
     
@@ -664,7 +664,7 @@ def bonusQuestion(num_games, num_mines, dim):
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
     ax.set_ylabel("Average Risk")
-    plt.title("Bonus Question for the Comparison btw Slightly Improved Agents When It Comes To Minimize Risk")
+    plt.title("BQ: Comparison btw Slightly Improved Agents When It Comes To Minimizing Risk")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0]), ('Minimizing Cost', 'Minimizing Risk'))
     
@@ -674,7 +674,7 @@ def bonusQuestion(num_games, num_mines, dim):
 if __name__ == "__main__":
     risk = 0
     num_mines = 10
-    num_games = 50
+    num_games = 100
     size = 10
     
     for i in range(num_games):
@@ -683,5 +683,5 @@ if __name__ == "__main__":
         risk += (imp_agent.gameStart() / num_mines)
     print("The risk rate is " + str((risk/num_games) * 100) + "%.")
     
-    iterateForComparison(num_games, num_mines, size)
+    #iterateForComparison(num_games, num_mines, size)
     bonusQuestion(num_games, num_mines, size)
