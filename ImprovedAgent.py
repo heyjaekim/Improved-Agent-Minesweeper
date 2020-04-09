@@ -298,17 +298,14 @@ class improvedAgent(object):
                                     cnt += 1
                     if self.imp == 2 and cnt != 0 and p / cnt <= min_p and p < 1/2:
                         min_p = p / cnt
-                        #mine_p = p
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
                     if self.imp == 1 and cnt != 0 and p / cnt <= min_p:
                         min_p = p / cnt
-                        #mine_p = p
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
                     if self.imp == 0 and cnt != 0 and p / cnt <= min_p:
                         min_p = p / cnt
-                        #mine_p = p
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
         if (aim_x, aim_y) != (0, 0):
@@ -465,7 +462,7 @@ class improvedAgent(object):
                     self.random_outside()
                 return True
 
-        if self.imp == 1:
+        elif self.imp == 1:
             if len(possible_mines) != 0:
             #if len(possible_mines) != 0:
                 (mine_p, (x, y)) = possible_mines[0]
@@ -483,7 +480,8 @@ class improvedAgent(object):
                             self.identify_tile(aim_x, aim_y)
                             return True
                         i += 1  
-                    self.random_outside()  
+                    if self.imp_random_outside() is False:
+                        self.random_outside()
                     return True
                 else:
                     self.identify_tile(aim_x, aim_y)
@@ -690,11 +688,5 @@ if __name__ == "__main__":
     num_mines = 10
     num_games = 20
     size = 10
-    
-    for i in range(num_games):
-        rendered_grid = ImprovedSetting(size, num_mines)
-        imp_agent = improvedAgent(rendered_grid)
-        score += (imp_agent.gameStart() / num_mines)
-    print("The score rate is " + str((score/num_games) * 100) + "%.")
     
     iterateForComparison(num_games, num_mines, size)
