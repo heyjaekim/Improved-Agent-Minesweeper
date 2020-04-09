@@ -68,7 +68,7 @@ if __name__=='__main__':
     rendered_grid = ImprovedSetting(10, 30)
     #imp_agent = minimizingCostAgent(rendered_grid, 2)
     #imp_agent = minimizingRiskAgent(rendered_grid, 2)
-    #imp_agent = improvedAgent(rendered_grid, 2)
+    imp_agent = improvedAgent(rendered_grid, 2)
     board = Visual(rendered_grid, imp_agent)
     board.mainloop()
 

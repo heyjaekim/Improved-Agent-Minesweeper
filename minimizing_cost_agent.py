@@ -595,7 +595,7 @@ def iterateAgent(num_games, num_mines, dim):
 
 def iterateForComparison(num_games, num_mines, dim):
     mines = num_mines
-    iterations = 100
+    iterations = 19
     score = 0
     score2 = 0
     avg_score = []
@@ -631,20 +631,20 @@ def iterateForComparison(num_games, num_mines, dim):
     second_plot = ax.bar(x + width, avg_score2, width, color = 'orange')
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
-    ax.set_ylabel("AVERAGE COST (# OF MINES STEPPED ON)")
-    plt.title("Plot Comparison btw Original Improved Agent and Minimizing Cost Agent")
+    ax.set_ylabel("COST (# OF MINES STEPPED IN)")
+    plt.title("Plot Comparison btw Original Agent and Slightly Improved Agent")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0]), ('Original Improved Agent', 'Minimizing Cost Agent'))
     
     plt.show()
 
 #-------------------------------------------------------------
-#"This is the bonus question for the basic agent: (first question)
+#"This is the bonus question for the baisc agent: (first question)
 # risk minimizing agent compare to the cost minimizing agent when it comes to minimizing cost?"
 #-------------------------------------------------------------
 def bonusQuestion(num_games, num_mines, dim):
     mines = num_mines
-    iterations = 20
+    iterations = 19
     score = 0
     score2 = 0
     avg_score = []
@@ -679,7 +679,7 @@ def bonusQuestion(num_games, num_mines, dim):
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
     ax.set_ylabel("COST (# OF MINES STEPPED IN)")
-    plt.title("Bonus Question: Comparison btw Slightly Improved Agents When It Comes To Minimizing Cost")
+    plt.title("Bonus Qeustion for the Comparison btw Slightly Improved Agents When It Comes To Minimize Cost")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0]), ('minimizing cost', 'minimizing risk'))
     
@@ -699,4 +699,4 @@ if __name__ == "__main__":
     print("The score rate is " + str((score/num_games) * 100) + "%.")
     
     iterateForComparison(num_games, num_mines, size)
-    #bonusQuestion(num_games, num_mines, size)
+    bonusQuestion(num_games, num_mines, size)
