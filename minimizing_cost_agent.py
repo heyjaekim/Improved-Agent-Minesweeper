@@ -303,12 +303,10 @@ class minimizingCostAgent(object):
                                     cnt += 1
                     if self.imp == 2 and cnt != 0 and p / cnt <= min_p: # and p < 1/2:# and less than 1/2?: #p <= min_p: #p / cnt <= min_p:
                         min_p = p / cnt
-                        #mine_p = p
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
                     if self.imp == 0 and cnt != 0 and p / cnt <= min_p :# and less than 1/2?: #p <= min_p: #p / cnt <= min_p:
                         min_p = p / cnt
-                        #mine_p = p
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
         if (aim_x, aim_y) != (0, 0):
@@ -440,14 +438,11 @@ class minimizingCostAgent(object):
 
         if self.imp == 2:
             if len(possible_mines) != 0:
-            #if len(possible_mines) != 0:
                 (mine_p, (x, y)) = possible_mines[0]
 
                 if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
-                    #print("process the query nearby")
                     (aim_x, aim_y) = self.probability_inference(x, y)
                     if (aim_x, aim_y) == (-1, -1):
-                        #self.random_outside()
                         i = 1
                         while(i < len(possible_mines)):
                             (mine_p, (x,y)) = possible_mines[i]
@@ -456,19 +451,18 @@ class minimizingCostAgent(object):
                                 self.identify_tile(aim_x, aim_y)
                                 return True
                             i += 1  
-                        self.random_outside()  
+                        if self.imp_random_outside() is False:
+                            self.random_outside()
                         return True
                     else:
                         self.identify_tile(aim_x, aim_y)
                         return True
+                        
         elif self.imp == 3:
             if len(possible_mines) != 0:
-            #if len(possible_mines) != 0:
                 (mine_p, (x, y)) = possible_mines[0]
 
                 if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
-                    #print("process the query risk inference")
-                    #(aim_x, aim_y) = self.probability_inference(x, y)
                     (aim_x, aim_y, indication) = self.risk_inference(x, y)    
 
                     if (aim_x, aim_y) == (-1, -1):
@@ -517,6 +511,80 @@ class minimizingCostAgent(object):
         self.identify_tile(x,y)
         #print("random outside")
 
+    def imp_random_outside(self):
+        covered_tiles = []
+        tempQ = Q.Queue()
+        possible_mines = []
+
+        for x in range(self.dim):
+            for y in range(self.dim):
+                if self.board[x][y] == 9:
+                    covered_tiles.append((x,y))
+        if len(covered_tiles) == 0:
+            return False
+
+        while self.cell_unresolved.qsize():
+            (x, y) = self.cell_unresolved.get()
+            tempQ.put((x, y))
+            num_mines = self.board[x][y]
+            identified_mines, clear_tiles, hidden_num, num_adj_squares = self.get_adj_tiles_info(x, y)
+            #stroe the kb inference for the squares near by (x,y) 
+            p = (num_mines - identified_mines) / hidden_num
+            possible_mines.append((p, (x, y)))
+
+        possible_mines.sort()
+        while tempQ.qsize():
+            self.cell_unresolved.put(tempQ.get())
+        
+        i = 0
+        max_hidden = 0
+        #while i < len(possible_mines):
+
+        (mine_p, (x, y)) = possible_mines[0]
+        aim_x, aim_y = -1, -1
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                (neighbor_x, neighbor_y) = (x+i, y+j)
+                if (self.isValid(neighbor_x, neighbor_y)
+                    and self.board[neighbor_x][neighbor_y] == 9
+                    and (i != 0 or j != 0)):
+                    
+                    for k in range(-1, 2):
+                        for l in range(-1, 2):
+                            (adj_x, adj_y) = (neighbor_x + k, neighbor_y + l)
+
+                            if(self.isValid(adj_x, adj_y)
+                                and self.board[adj_x][adj_y] == 9
+                                and (k != 0 or l != 0)):
+
+                                ind = 0
+                                num_hidden = 0
+                                for n in range(-1, 2):
+                                    for m in range(-1, 2):
+                                        (ins_x, ins_y) = (adj_x + n, adj_y + m)
+                                        if (self.isValid(ins_x, ins_y) 
+                                            and (n != 0 or m != 0)
+                                            and 0 <= self.board[ins_x][ins_y] < 9):
+                                            ind = 1
+                                        else:
+                                            num_hidden += 1
+                                        
+                                if ind == 0 and num_hidden > max_hidden:
+                                    (aim_x, aim_y) = (adj_x, adj_y)
+                                    max_hidden = num_hidden
+                                
+                                if max_hidden == 8:
+                                    self.identify_tile(aim_x, aim_y)
+                                    #print("improved random outside with 8 hidden sqrs")
+                                    return True
+        
+        if (aim_x, aim_y) != (-1, -1):
+            self.identify_tile(aim_x, aim_y)
+            #print("improved random outside")
+            return True
+        #print("improved random outside failed")
+        return False
+
     def identify_tile(self, aim_x, aim_y, indication = 0):
         
         if indication == 1: #found the mined square
@@ -529,8 +597,6 @@ class minimizingCostAgent(object):
                 self.board[aim_x][aim_y] = self.env.processQuery(aim_x, aim_y, False)
                 self.cell_to_inference.put((aim_x, aim_y))
                 self.identified_num += 1
-                #self.score += 1
-                #print("indication 1 fail")
             
         elif indication == 2: #found the non-mined square
             if self.env.checkQuery(aim_x, aim_y, 2) is True: 
@@ -540,7 +606,6 @@ class minimizingCostAgent(object):
                 #print("indication 2 success")
             else:    
                 self.board[aim_x][aim_y] = -1 
-                #self.cell_to_inference.put((aim_x, aim_y))
                 self.identified_num += 1
                 self.score += 1
                 #print("indication 2 fail")
@@ -554,17 +619,6 @@ class minimizingCostAgent(object):
             self.board[aim_x][aim_y] = self.env.processQuery(aim_x, aim_y, False)
             self.cell_to_inference.put((aim_x, aim_y))
             self.identified_num += 1
-    '''
-    def identify_tile(self, aim_x, aim_y):
-        if self.env.processQuery(aim_x, aim_y, False) is False:
-                self.board[aim_x][aim_y] = -1
-                self.identified_num += 1
-                self.score += 1
-        else:
-            self.board[aim_x][aim_y] = self.env.processQuery(aim_x, aim_y, False)
-            self.cell_to_inference.put((aim_x, aim_y))
-            self.identified_num += 1
-    '''
 
 def iterateAgent(num_games, num_mines, dim):
     mines = num_mines
@@ -628,13 +682,13 @@ def iterateForComparison(num_games, num_mines, dim):
     width = 1.0
 
     first_plot = ax.bar(x, avg_score, width, color = 'r')
-    second_plot = ax.bar(x + width, avg_score2, width, color = 'orange')
+    second_plot = ax.bar(x + width, avg_score2, width, color = 'g')
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
     ax.set_ylabel("COST (# OF MINES STEPPED IN)")
     plt.title("Plot Comparison btw Original Agent and Slightly Improved Agent")
     plt.xticks(x)
-    ax.legend( (first_plot[0], second_plot[0]), ('Original Improved Agent', 'Minimizing Cost Agent'))
+    ax.legend( (first_plot[0], second_plot[0]), ('Original Agent', 'Minimizing Cost Agent'))
     
     plt.show()
 
@@ -681,7 +735,7 @@ def bonusQuestion(num_games, num_mines, dim):
     ax.set_ylabel("COST (# OF MINES STEPPED IN)")
     plt.title("Bonus Qeustion for the Comparison btw Slightly Improved Agents When It Comes To Minimize Cost")
     plt.xticks(x)
-    ax.legend( (first_plot[0], second_plot[0]), ('minimizing cost', 'minimizing risk'))
+    ax.legend( (first_plot[0], second_plot[0]), ('Minimizing Cost Agent', 'Minimizing Risk Agent'))
     
     plt.show()
 

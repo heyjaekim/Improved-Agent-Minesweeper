@@ -296,7 +296,7 @@ class minimizingRiskAgent(object):
                                 else:
                                     p += tmp_p
                                     cnt += 1
-                    if self.imp == 2 and cnt != 0 and p / cnt <= min_p and p < 1/2:# and less than 1/2?: #p <= min_p: #p / cnt <= min_p:
+                    if self.imp == 2 and cnt != 0 and p / cnt <= min_p and p <= 1/2:# and less than 1/2?: #p <= min_p: #p / cnt <= min_p:
                         min_p = p / cnt
                         #mine_p = p
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
@@ -381,7 +381,7 @@ class minimizingRiskAgent(object):
                                     s += tmp_s * (1-tmp_p)
                                     solvable_sqrs += tmp_solvable_sqrs
 
-                    if self.imp == 2 and cnt != 0 and solvable_sqrs >= max_sol_sqrs :
+                    if self.imp == 2 and cnt != 0 and solvable_sqrs > max_sol_sqrs :
                         #mine_p = p
                         if r >= s: # r is the expected number of squares if the target sqr is a mine, and s is the oppsite situation of r
                             max_sol_sqrs = solvable_sqrs
@@ -621,7 +621,7 @@ def iterateForComparison(num_games, num_mines, dim):
     ax.set_ylabel("Average Risk")
     plt.title("Plot Comparison btw Original Agent and Slightly Improved Agent")
     plt.xticks(x)
-    ax.legend( (first_plot[0], second_plot[0]), ('Original Improved Agent', 'Minimizing Risk Agent'))
+    ax.legend( (first_plot[0], second_plot[0]), ('Original Agent', 'Minimizing Risk Agent'))
     
     plt.show()
 
@@ -663,10 +663,10 @@ def bonusQuestion(num_games, num_mines, dim):
     second_plot = ax.bar(x + width, avg_risk2, width, color = 'g')
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
-    ax.set_ylabel("COST (# OF MINES STEPPED IN)")
+    ax.set_ylabel("Average Risk")
     plt.title("Bonus Question for the Comparison btw Slightly Improved Agents When It Comes To Minimize Risk")
     plt.xticks(x)
-    ax.legend( (first_plot[0], second_plot[0]), ('minimizing cost', 'minimizing risk minimizing'))
+    ax.legend( (first_plot[0], second_plot[0]), ('Minimizing Cost', 'Minimizing Risk'))
     
     plt.show()
 

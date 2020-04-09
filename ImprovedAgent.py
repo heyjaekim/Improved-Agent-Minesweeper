@@ -296,17 +296,17 @@ class improvedAgent(object):
                                 else:
                                     p += tmp_p
                                     cnt += 1
-                    if self.imp == 2 and cnt != 0 and p / cnt <= min_p and p < 1/2:# and less than 1/2?: #p <= min_p: #p / cnt <= min_p:
+                    if self.imp == 2 and cnt != 0 and p / cnt <= min_p and p < 1/2:
                         min_p = p / cnt
                         #mine_p = p
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
-                    if self.imp == 1 and cnt != 0 and p / cnt <= min_p:# and less than 1/2?: #p <= min_p: #p / cnt <= min_p:
+                    if self.imp == 1 and cnt != 0 and p / cnt <= min_p:
                         min_p = p / cnt
                         #mine_p = p
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
-                    if self.imp == 0 and cnt != 0 and p / cnt <= min_p :# and less than 1/2?: #p <= min_p: #p / cnt <= min_p:
+                    if self.imp == 0 and cnt != 0 and p / cnt <= min_p:
                         min_p = p / cnt
                         #mine_p = p
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
@@ -449,18 +449,18 @@ class improvedAgent(object):
                 while i < len(possible_mines):
                     (mine_p, (x, y)) = possible_mines[i]
                     i += 1
-                    if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
+                    #if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
                         #print("process the query risk inference")
                         
-                        (aim_x, aim_y, indication) = self.risk_inference(x, y)    
-                        if (aim_x, aim_y) == (-1, -1):
-                            (aim_x, aim_y) = self.probability_inference(x, y)
-                            if (aim_x, aim_y) != (-1, -1):
-                                self.identify_tile(aim_x, aim_y)
-                        else:
-                            self.identify_tile(aim_x, aim_y, indication)
-                            return True
-                    
+                    (aim_x, aim_y, indication) = self.risk_inference(x, y)    
+                    if (aim_x, aim_y) == (-1, -1):
+                        (aim_x, aim_y) = self.probability_inference(x, y)
+                        if (aim_x, aim_y) != (-1, -1):
+                            self.identify_tile(aim_x, aim_y)
+                    else:
+                        self.identify_tile(aim_x, aim_y, indication)
+                        return True
+                
                 if self.imp_random_outside() is False:
                     self.random_outside()
                 return True
@@ -470,39 +470,39 @@ class improvedAgent(object):
             #if len(possible_mines) != 0:
                 (mine_p, (x, y)) = possible_mines[0]
 
-                if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
+                #if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
                     #print("process the query nearby")
-                    (aim_x, aim_y) = self.probability_inference(x, y)
-                    if (aim_x, aim_y) == (-1, -1):
-                        #self.random_outside()
-                        i = 1
-                        while(i < len(possible_mines)):
-                            (mine_p, (x,y)) = possible_mines[i]
-                            (aim_x, aim_y) = self.probability_inference(x, y)
-                            if (aim_x, aim_y) != (-1, -1):
-                                self.identify_tile(aim_x, aim_y)
-                                return True
-                            i += 1  
-                        self.random_outside()  
-                        return True
-                    else:
-                        self.identify_tile(aim_x, aim_y)
-                        return True
+                (aim_x, aim_y) = self.probability_inference(x, y)
+                if (aim_x, aim_y) == (-1, -1):
+                    #self.random_outside()
+                    i = 1
+                    while(i < len(possible_mines)):
+                        (mine_p, (x,y)) = possible_mines[i]
+                        (aim_x, aim_y) = self.probability_inference(x, y)
+                        if (aim_x, aim_y) != (-1, -1):
+                            self.identify_tile(aim_x, aim_y)
+                            return True
+                        i += 1  
+                    self.random_outside()  
+                    return True
+                else:
+                    self.identify_tile(aim_x, aim_y)
+                    return True
 
         else: #self.imp == 0
             if len(possible_mines) != 0:
                 random_num = randint(0, len(possible_mines)-1)
                 (mine_p, (x, y)) = possible_mines[random_num]
 
-                if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
-                    (aim_x, aim_y) = self.probability_inference(x, y)
-                    if (aim_x, aim_y) == (-1, -1):
-                        self.random_outside()  
-                        return True
-                    else:
-                        self.identify_tile(aim_x, aim_y)
-                        return True
-    
+                #if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
+                (aim_x, aim_y) = self.probability_inference(x, y)
+                if (aim_x, aim_y) == (-1, -1):
+                    self.random_outside()  
+                    return True
+                else:
+                    self.identify_tile(aim_x, aim_y)
+                    return True
+
         self.random_outside()
 
 
@@ -619,9 +619,8 @@ class improvedAgent(object):
                 #print("indication 2 success")
             else:    
                 self.board[aim_x][aim_y] = -1 
-                #self.cell_to_inference.put((aim_x, aim_y))
                 self.identified_num += 1
-                #self.score += 1
+                self.score += 1
                 #print("indication 2 fail")
         
         elif indication == 0 and self.env.processQuery(aim_x, aim_y, False) is False:
@@ -677,8 +676,8 @@ def iterateForComparison(num_games, num_mines, dim):
     third_plot = ax.bar(x + width * 2, avg_score3, width, color = 'navy')
 
 
-    ax.set_xlabel("mine density in #")
-    ax.set_ylabel("Cost (total # of mines stepped in")
+    ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
+    ax.set_ylabel("COST (# OF MINES STEPPED IN)")
     plt.title("Performance Comparison Regarding in perspective of minimizing cost")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0], third_plot[0]), ('Original Agent', 'Slightly Imp Agent', 'Improved Agent'))
