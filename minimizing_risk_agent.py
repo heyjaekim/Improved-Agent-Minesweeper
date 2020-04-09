@@ -461,7 +461,7 @@ class minimizingRiskAgent(object):
                     self.identify_tile(aim_x, aim_y)
                     return True
 
-        if self.imp == 2:
+        elif self.imp == 2:
             if len(possible_mines) != 0:
                 (mine_p, (x, y)) = possible_mines[0]
 
