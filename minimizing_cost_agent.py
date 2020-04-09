@@ -501,25 +501,6 @@ class minimizingCostAgent(object):
                         self.identify_tile(aim_x, aim_y)
                         return True
                 
-        '''
-        if self.imp == 0 and len(possible_mines) != 0 :
-
-            if len(possible_mines) > 1:
-                (mine_p, (x, y)) = possible_mines[randint(0,len(possible_mines)-1)]
-                if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
-                    #print("process the query nearby")
-                    (aim_x, aim_y) = self.probability_inference(x, y)
-                    self.identify_tile(aim_x, aim_y)
-                    return True
-
-            elif len(possible_mines) == 1:
-                (mine_p, (x, y)) = possible_mines[0]
-                if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
-                    #print("process the query nearby")
-                    (aim_x, aim_y) = self.probability_inference(x, y)
-                    self.identify_tile(aim_x, aim_y)
-                    return True
-        '''
         self.random_outside()
 
 
@@ -647,7 +628,7 @@ def iterateForComparison(num_games, num_mines, dim):
     width = 1.0
 
     first_plot = ax.bar(x, avg_score, width, color = 'r')
-    second_plot = ax.bar(x + width, avg_score2, width, color = 'g')
+    second_plot = ax.bar(x + width, avg_score2, width, color = 'orange')
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
     ax.set_ylabel("COST (# OF MINES STEPPED IN)")
@@ -693,7 +674,7 @@ def bonusQuestion(num_games, num_mines, dim):
     x = np.arange(10, mines, 5)
     width = 1.0
 
-    first_plot = ax.bar(x, avg_score, width, color = 'r')
+    first_plot = ax.bar(x, avg_score, width, color = 'orange')
     second_plot = ax.bar(x + width, avg_score2, width, color = 'g')
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")

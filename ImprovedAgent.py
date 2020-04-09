@@ -673,8 +673,8 @@ def iterateForComparison(num_games, num_mines, dim):
     width = 1.0
 
     first_plot = ax.bar(x, avg_score, width, color = 'r')
-    second_plot = ax.bar(x + width, avg_score2, width, color = 'sandybrown')
-    third_plot = ax.bar(x + width * 2, avg_score3, width, color = 'g')
+    second_plot = ax.bar(x + width, avg_score2, width, color = 'orangered')
+    third_plot = ax.bar(x + width * 2, avg_score3, width, color = 'navy')
 
 
     ax.set_xlabel("mine density in #")
