@@ -670,7 +670,7 @@ def iterateForComparison(num_games, num_mines, dim):
     width = 1.0
 
     first_plot = ax.bar(x, avg_score, width, color = 'r')
-    second_plot = ax.bar(x + width, avg_score2, width, color = 'g')
+    second_plot = ax.bar(x + width, avg_score2, width, color = 'limegreen')
     third_plot = ax.bar(x + width * 2, avg_score3, width, color = 'navy')
 
 
@@ -686,7 +686,7 @@ def iterateForComparison(num_games, num_mines, dim):
 if __name__ == "__main__":
     score = 0
     num_mines = 10
-    num_games = 20
+    num_games = 1000
     size = 10
     
     iterateForComparison(num_games, num_mines, size)
