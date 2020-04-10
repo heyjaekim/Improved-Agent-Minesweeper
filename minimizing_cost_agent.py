@@ -685,7 +685,7 @@ def iterateForComparison(num_games, num_mines, dim):
     second_plot = ax.bar(x + width, avg_score2, width, color = 'limegreen')
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
-    ax.set_ylabel("COST (# OF MINES STEPPED IN)")
+    ax.set_ylabel("COST (# OF MINES STEPPED ON)")
     plt.title("Plot Comparison btw Original Agent and Slightly Improved Agent")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0]), ('Original Agent', 'Minimizing Cost Agent'))
