@@ -500,9 +500,22 @@ class improvedAgent(object):
                 else:
                     self.identify_tile(aim_x, aim_y)
                     return True
+        
+        #self.random_outside()
+        self.initial_random_outside()
 
-        self.random_outside()
 
+    def initial_random_outside(self):
+        covered_tiles = []
+        for x in range(self.dim):
+            for y in range(self.dim):
+                if self.board[x][y] == 9:
+                    covered_tiles.append((x,y))
+        if len(covered_tiles) == 0:
+            return False
+        k = random.randint(0, len(covered_tiles) - 1)
+        (x, y) = covered_tiles[k]
+        self.initial_identify_tile(x,y)
 
     def random_outside(self):
         covered_tiles = []
@@ -515,8 +528,6 @@ class improvedAgent(object):
         k = random.randint(0, len(covered_tiles) - 1)
         (x, y) = covered_tiles[k]
         self.identify_tile(x,y)
-        #self.score += 1
-        #print("random outside")
 
     def imp_random_outside(self):
         covered_tiles = []
@@ -592,7 +603,16 @@ class improvedAgent(object):
         #print("improved random outside failed")
         return False
 
+    def initial_identify_tile(self, aim_x, aim_y, indication = 0):
+        
+        if indication == 0 and self.env.processQuery(aim_x, aim_y, False) is False:
+            self.board[aim_x][aim_y] = -1
+            self.identified_num += 1
 
+        elif indication == 0:
+            self.board[aim_x][aim_y] = self.env.processQuery(aim_x, aim_y, False)
+            self.cell_to_inference.put((aim_x, aim_y))
+            self.identified_num += 1
 
     def identify_tile(self, aim_x, aim_y, indication = 0):
         
@@ -675,7 +695,7 @@ def iterateForComparison(num_games, num_mines, dim):
 
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
-    ax.set_ylabel("COST (# OF MINES STEPPED IN)")
+    ax.set_ylabel("COST (# OF MINES STEPPED ON)")
     plt.title("Performance Comparison Regarding in perspective of minimizing cost")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0], third_plot[0]), ('Original Agent', 'Slightly Imp Agent', 'Improved Agent'))
