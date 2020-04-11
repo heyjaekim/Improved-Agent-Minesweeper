@@ -301,11 +301,11 @@ class minimizingCostAgent(object):
                                 else:
                                     p += tmp_p
                                     cnt += 1
-                    if self.imp == 2 and cnt != 0 and p / cnt <= min_p: # and p < 1/2:# and less than 1/2?: #p <= min_p: #p / cnt <= min_p:
+                    if self.imp == 2 and cnt != 0 and p / cnt < min_p and p <= 1/2:
                         min_p = p / cnt
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
-                    if self.imp == 0 and cnt != 0 and p / cnt <= min_p :# and less than 1/2?: #p <= min_p: #p / cnt <= min_p:
+                    if self.imp == 0 and cnt != 0 and p / cnt < min_p:
                         min_p = p / cnt
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
@@ -438,26 +438,21 @@ class minimizingCostAgent(object):
 
         if self.imp == 2:
             if len(possible_mines) != 0:
-                (mine_p, (x, y)) = possible_mines[0]
-
-                if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
+                i = 0
+                while i < len(possible_mines):
+                    (mine_p, (x, y)) = possible_mines[i]
+                    i += 1
+                    #if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
                     (aim_x, aim_y) = self.probability_inference(x, y)
-                    if (aim_x, aim_y) == (-1, -1):
-                        i = 1
-                        while(i < len(possible_mines)):
-                            (mine_p, (x,y)) = possible_mines[i]
-                            (aim_x, aim_y) = self.probability_inference(x, y)
-                            if (aim_x, aim_y) != (-1, -1):
-                                self.identify_tile(aim_x, aim_y)
-                                return True
-                            i += 1  
-                        if self.imp_random_outside() is False:
-                            self.random_outside()
-                        return True
-                    else:
+                    
+                    if (aim_x, aim_y) != (-1, -1):
                         self.identify_tile(aim_x, aim_y)
                         return True
-                        
+
+                if self.imp_random_outside() is False:
+                    self.random_outside()
+                return True
+                    
         elif self.imp == 3:
             if len(possible_mines) != 0:
                 (mine_p, (x, y)) = possible_mines[0]
@@ -486,17 +481,33 @@ class minimizingCostAgent(object):
                 random_num = randint(0, len(possible_mines)-1)
                 (mine_p, (x, y)) = possible_mines[random_num]
 
-                if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
-                    (aim_x, aim_y) = self.probability_inference(x, y)
-                    if (aim_x, aim_y) == (-1, -1):
-                        self.random_outside()  
-                        return True
-                    else:
-                        self.identify_tile(aim_x, aim_y)
-                        return True
-                
+                #if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
+                (aim_x, aim_y) = self.probability_inference(x, y)
+                if (aim_x, aim_y) == (-1, -1):
+                    self.random_outside()  
+                    return True
+                else:
+                    self.identify_tile(aim_x, aim_y)
+                    return True
+        
         self.random_outside()
+        #if self.imp == 2:        
+        #    self.initial_random_outside()
+        #else:
+        #    self.random_outside()
+        
 
+    def initial_random_outside(self):
+        covered_tiles = []
+        for x in range(self.dim):
+            for y in range(self.dim):
+                if self.board[x][y] == 9:
+                    covered_tiles.append((x,y))
+        if len(covered_tiles) == 0:
+            return False
+        k = random.randint(0, len(covered_tiles) - 1)
+        (x, y) = covered_tiles[k]
+        self.initial_identify_tile(x,y)
 
     def random_outside(self):
         covered_tiles = []
@@ -584,6 +595,17 @@ class minimizingCostAgent(object):
             return True
         #print("improved random outside failed")
         return False
+
+    def initial_identify_tile(self, aim_x, aim_y, indication = 0):
+        
+        if indication == 0 and self.env.processQuery(aim_x, aim_y, False) is False:
+            self.board[aim_x][aim_y] = -1
+            self.identified_num += 1
+
+        elif indication == 0:
+            self.board[aim_x][aim_y] = self.env.processQuery(aim_x, aim_y, False)
+            self.cell_to_inference.put((aim_x, aim_y))
+            self.identified_num += 1
 
     def identify_tile(self, aim_x, aim_y, indication = 0):
         
@@ -743,7 +765,7 @@ def bonusQuestion(num_games, num_mines, dim):
 if __name__ == "__main__":
     score = 0
     num_mines = 10
-    num_games = 1000
+    num_games = 100
     size = 10
     
     for i in range(num_games):
@@ -753,4 +775,4 @@ if __name__ == "__main__":
     print("The score rate is " + str((score/num_games) * 100) + "%.")
     
     iterateForComparison(num_games, num_mines, size)
-    bonusQuestion(num_games, num_mines, size)
+    #bonusQuestion(num_games, num_mines, size)

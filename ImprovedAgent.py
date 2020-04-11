@@ -414,7 +414,6 @@ class improvedAgent(object):
         elif (num_adj_squares - num_mines) - clear_tiles == new_hidden_num:
             s = new_hidden_num
         else:
-            #print("baseline false")
             return 0,0
         return r,s
 
