@@ -26,7 +26,7 @@ class bonusImprovedAgent(object):
         self.finished_num = 0
         self.final_hidden_num = []   
         self.final_num_mines = []      
-        self.score = 0
+        self.risk = 0
         self.imp = imp #0 for agent from assignment two, 1 for min cost, and 2 for improved agent
 
     #--------------------------------------------------------
@@ -43,12 +43,12 @@ class bonusImprovedAgent(object):
     # it will unreveal the square with multiple clues at a time
     #--------------------------------------------------------
     def gameStart(self):
-        score = 0
+        risk = 0
         #else is when we are solving the mineweeper with improved agent.
         while self.identified_num < self.dim * self.dim:
-            score = self.inference_start()
+            risk = self.inference_start()
             
-        return score
+        return risk
 
     def inference_start(self):
         inf_state = 0
@@ -81,7 +81,7 @@ class bonusImprovedAgent(object):
         else:
             return -1
 
-        return self.score
+        return self.risk
 
     #--------------------------------------------------------
     # """process baseline inference from the cell_to_inference square tiles that have found
@@ -102,7 +102,7 @@ class bonusImprovedAgent(object):
                     if self.isValid(x+i, y+j) and self.board[x + i][y + j] == 9:
                         self.board[x + i][y + j] = -1
                         self.env.mark_mine((x+i, y+j))
-                        #self.score += 1
+                        #self.risk += 1
                         while self.cell_unresolved.qsize():
                             self.cell_to_inference.put(self.cell_unresolved.get())
                         self.identified_num += 1
@@ -204,7 +204,7 @@ class bonusImprovedAgent(object):
                 self.env.mark_mine((x, y))
                 self.identified_num += 1
                 #print("flagged_squrs")
-                #self.score += 1
+                #self.risk += 1
      
             return 1
     
@@ -297,10 +297,6 @@ class bonusImprovedAgent(object):
                                     p += tmp_p
                                     cnt += 1
                     if self.imp == 2 and cnt != 0 and p / cnt <= min_p and p < 1/2:
-                        min_p = p / cnt
-                        (aim_x, aim_y) = (neighbor_x, neighbor_y)
-
-                    if self.imp == 1 and cnt != 0 and p / cnt <= min_p and p < 1/2:
                         min_p = p / cnt
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
@@ -457,9 +453,9 @@ class bonusImprovedAgent(object):
                         self.identify_tile(aim_x, aim_y, indication)
                         return True
                 
-                #if self.imp_random_outside() is False:
-                self.random_outside()
-                #return True
+                if self.imp_random_outside() is False:
+                    self.random_outside()
+                return True
 
         elif self.imp == 1:
             if len(possible_mines) != 0:
@@ -478,9 +474,9 @@ class bonusImprovedAgent(object):
                             self.identify_tile(aim_x, aim_y, indication)
                             return True
                         i += 1  
-                    #if self.imp_random_outside() is False:
-                    self.random_outside()
-                    #return True
+                    if self.imp_random_outside() is False:
+                        self.random_outside()
+                    return True
 
                 else:
                     self.identify_tile(aim_x, aim_y, indication)
@@ -623,7 +619,7 @@ class bonusImprovedAgent(object):
                 self.board[aim_x][aim_y] = self.env.processQuery(aim_x, aim_y, False)
                 self.cell_to_inference.put((aim_x, aim_y))
                 self.identified_num += 1
-                self.score += 1
+                self.risk += 1
                 #print("indication 1 fail")
             
         elif indication == 2: #found the non-mined square
@@ -635,13 +631,13 @@ class bonusImprovedAgent(object):
             else:    
                 self.board[aim_x][aim_y] = -1 
                 self.identified_num += 1
-                self.score += 1
+                self.risk += 1
                 #print("indication 2 fail")
         
         elif indication == 0 and self.env.processQuery(aim_x, aim_y, False) is False:
             self.board[aim_x][aim_y] = -1
             self.identified_num += 1
-            self.score += 1
+            self.risk += 1
 
         elif indication == 0:
             self.board[aim_x][aim_y] = self.env.processQuery(aim_x, aim_y, False)
@@ -651,57 +647,57 @@ class bonusImprovedAgent(object):
 def iterateForComparison(num_games, num_mines, dim):
     mines = num_mines
     iterations = 19
-    score = 0
-    score2 = 0
-    score3 = 0
-    avg_score = []
-    avg_score2 = []
-    avg_score3 = []
+    risk = 0
+    risk2 = 0
+    risk3 = 0
+    avg_risk = []
+    avg_risk2 = []
+    avg_risk3 = []
     for t in range(iterations):
         for i in range(num_games):
 
             rendered_grid = ImprovedSetting(dim, mines)
             imp_agent = bonusImprovedAgent(rendered_grid)
-            score += (imp_agent.gameStart())
+            risk += (imp_agent.gameStart())
 
             rendered_grid2 = ImprovedSetting(dim, mines)
             imp_agent2 = bonusImprovedAgent(rendered_grid2, 1)
-            score2 += (imp_agent2.gameStart())
+            risk2 += (imp_agent2.gameStart())
 
             rendered_grid3 = ImprovedSetting(dim, mines)
             imp_agent3 = bonusImprovedAgent(rendered_grid3, 2)
-            score3 += (imp_agent3.gameStart())
+            risk3 += (imp_agent3.gameStart())
         
-        avg_score.append((score / num_games))
-        avg_score2.append((score2 / num_games))
-        avg_score3.append((score3 / num_games))
+        avg_risk.append((risk / num_games))
+        avg_risk2.append((risk2 / num_games))
+        avg_risk3.append((risk3 / num_games))
         
         mines += 5
-        score = 0
-        score2 = 0
-        score3 = 0
+        risk = 0
+        risk2 = 0
+        risk3 = 0
     
     fig = plt.figure(figsize=(10,5))
     ax = fig.add_subplot(111)
     x = np.arange(10, mines, 5)
     width = 1.0
 
-    first_plot = ax.bar(x, avg_score, width, color = 'r')
-    second_plot = ax.bar(x + width, avg_score2, width, color = 'limegreen')
-    third_plot = ax.bar(x + width * 2, avg_score3, width, color = 'navy')
+    first_plot = ax.bar(x, avg_risk, width, color = 'r')
+    second_plot = ax.bar(x + width, avg_risk2, width, color = 'limegreen')
+    third_plot = ax.bar(x + width * 2, avg_risk3, width, color = 'navy')
 
 
     ax.set_xlabel("# OF THE MINE (MINE DENSITY)")
-    ax.set_ylabel("Avg Risk (# OF MINES STEPPED ON)")
+    ax.set_ylabel("AVG RISK")
     plt.title("Performance Comparison Regarding in perspective of minimizing risk")
     plt.xticks(x)
     ax.legend( (first_plot[0], second_plot[0], third_plot[0]), ('Original Agent', 'Slightly Imp Agent', 'Improved Agent'))
     
     plt.show()
 
-"""Please modify four arguments for score, num_mines, num_games, size as you want"""
+"""Please modify four arguments for risk, num_mines, num_games, size as you want"""
 if __name__ == "__main__":
-    score = 0
+    risk = 0
     num_mines = 10
     num_games = 100
     size = 10
