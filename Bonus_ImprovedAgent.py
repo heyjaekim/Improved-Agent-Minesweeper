@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import seaborn as sns
 
-class improvedAgent(object):
+class bonusImprovedAgent(object):
 
     #--------------------------------------------------------
     # define basic self structures for improved agent agent
@@ -300,7 +300,7 @@ class improvedAgent(object):
                         min_p = p / cnt
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
-                    if self.imp == 1 and cnt != 0 and p / cnt <= min_p:
+                    if self.imp == 1 and cnt != 0 and p / cnt <= min_p and p < 1/2:
                         min_p = p / cnt
                         (aim_x, aim_y) = (neighbor_x, neighbor_y)
 
@@ -383,7 +383,7 @@ class improvedAgent(object):
                                     s += tmp_s * (1-tmp_p)
                                     solvable_sqrs += tmp_solvable_sqrs
 
-                    if self.imp == 2 and cnt != 0 and solvable_sqrs > max_sol_sqrs :
+                    if (self.imp == 2 or self.imp == 1) and cnt != 0 and solvable_sqrs > max_sol_sqrs :
                         #mine_p = p
                         if r >= s: # r is the expected number of squares if the target sqr is a mine, and s is the oppsite situation of r
                             max_sol_sqrs = solvable_sqrs
@@ -457,33 +457,33 @@ class improvedAgent(object):
                         self.identify_tile(aim_x, aim_y, indication)
                         return True
                 
-                if self.imp_random_outside() is False:
-                    self.random_outside()
-                return True
+                #if self.imp_random_outside() is False:
+                self.random_outside()
+                #return True
 
         elif self.imp == 1:
             if len(possible_mines) != 0:
-            #if len(possible_mines) != 0:
                 (mine_p, (x, y)) = possible_mines[0]
 
                 #if mine_p <= ( 1 - (self.count_global_mines() / self.env.num_mines)):
-                    #print("process the query nearby")
-                (aim_x, aim_y) = self.probability_inference(x, y)
+
+                (aim_x, aim_y, indication) = self.risk_inference(x, y)    
+
                 if (aim_x, aim_y) == (-1, -1):
-                    #self.random_outside()
                     i = 1
                     while(i < len(possible_mines)):
                         (mine_p, (x,y)) = possible_mines[i]
-                        (aim_x, aim_y) = self.probability_inference(x, y)
+                        (aim_x, aim_y, indication) = self.risk_inference(x, y)
                         if (aim_x, aim_y) != (-1, -1):
-                            self.identify_tile(aim_x, aim_y)
+                            self.identify_tile(aim_x, aim_y, indication)
                             return True
                         i += 1  
-                    if self.imp_random_outside() is False:
-                        self.random_outside()
-                    return True
+                    #if self.imp_random_outside() is False:
+                    self.random_outside()
+                    #return True
+
                 else:
-                    self.identify_tile(aim_x, aim_y)
+                    self.identify_tile(aim_x, aim_y, indication)
                     return True
 
         else: #self.imp == 0
@@ -500,8 +500,8 @@ class improvedAgent(object):
                     self.identify_tile(aim_x, aim_y)
                     return True
         
-        self.random_outside()
-        #self.initial_random_outside()
+        #self.random_outside()
+        self.initial_random_outside()
 
 
     def initial_random_outside(self):
@@ -581,12 +581,10 @@ class improvedAgent(object):
                                         (ins_x, ins_y) = (adj_x + n, adj_y + m)
                                         if (self.isValid(ins_x, ins_y) 
                                             and (n != 0 or m != 0)
-                                            and 0 <= self.board[ins_x][ins_y] < 9):
-                                            ind = 1
-                                        else:
+                                            and self.board[ins_x][ins_y] == 9):                                            
                                             num_hidden += 1
                                         
-                                if ind == 0 and num_hidden > max_hidden:
+                                if num_hidden > max_hidden:
                                     (aim_x, aim_y) = (adj_x, adj_y)
                                     max_hidden = num_hidden
                                 
@@ -625,7 +623,7 @@ class improvedAgent(object):
                 self.board[aim_x][aim_y] = self.env.processQuery(aim_x, aim_y, False)
                 self.cell_to_inference.put((aim_x, aim_y))
                 self.identified_num += 1
-                #self.score += 1
+                self.score += 1
                 #print("indication 1 fail")
             
         elif indication == 2: #found the non-mined square
@@ -663,15 +661,15 @@ def iterateForComparison(num_games, num_mines, dim):
         for i in range(num_games):
 
             rendered_grid = ImprovedSetting(dim, mines)
-            imp_agent = improvedAgent(rendered_grid)
+            imp_agent = bonusImprovedAgent(rendered_grid)
             score += (imp_agent.gameStart())
 
             rendered_grid2 = ImprovedSetting(dim, mines)
-            imp_agent2 = improvedAgent(rendered_grid2, 1)
+            imp_agent2 = bonusImprovedAgent(rendered_grid2, 1)
             score2 += (imp_agent2.gameStart())
 
             rendered_grid3 = ImprovedSetting(dim, mines)
-            imp_agent3 = improvedAgent(rendered_grid3, 2)
+            imp_agent3 = bonusImprovedAgent(rendered_grid3, 2)
             score3 += (imp_agent3.gameStart())
         
         avg_score.append((score / num_games))

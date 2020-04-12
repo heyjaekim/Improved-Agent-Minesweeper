@@ -674,7 +674,7 @@ def bonusQuestion(num_games, num_mines, dim):
 if __name__ == "__main__":
     risk = 0
     num_mines = 10
-    num_games = 1000
+    num_games = 100
     size = 10
     
     for i in range(num_games):
